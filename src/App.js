@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios'; 
 import moment from 'moment'; 
+import LocationBlocked from './Components/LocationBlocked'; 
 
 //Sunrise and Sunset API lat and long required and date if date needed is not today's date
 
@@ -9,6 +10,7 @@ class App extends Component {
   constructor(){
     super();
     this.state = {
+      locationBlocked: false,
       latitude: null, 
       longitude: null,
       sunriseTodayAPI: null,
@@ -30,9 +32,9 @@ class App extends Component {
           longitude: long, 
           date: new Date(),
         })
-      }, function (error) { // error callback that produces action in the case that the location is blocked
+      }, (error)  => { // error callback that produces action in the case that the location is blocked
         if (error.code === error.PERMISSION_DENIED)
-            alert("This application requires the use of geolocation to work. Please enable location to proceed");
+          {this.setState({locationBlocked: true})}
       })
     }
   }
@@ -93,7 +95,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        
+        {this.state.locationBlocked ? <LocationBlocked /> : null}
       </div>
     );
   }
