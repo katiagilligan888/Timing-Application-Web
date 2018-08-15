@@ -3,6 +3,7 @@ import './App.css';
 import axios from 'axios'; 
 import moment from 'moment'; 
 import LocationBlocked from './Components/LocationBlocked'; 
+import Header from './Components/Header'; 
 
 //Sunrise and Sunset API lat and long required and date if date needed is not today's date
 
@@ -14,10 +15,23 @@ class App extends Component {
       latitude: null, 
       longitude: null,
       sunriseTodayAPI: null,
-      date: null, 
-      UTCformat :null,
+      dateToday: null, 
+      UTCformat: null,
       localSunriseTime: null, 
+      displayTime: null, 
     }
+  }
+
+  displayTime() {
+    let time = new Date()
+    const options = {hour12: true, hour: 'numeric', minute: 'numeric', weekday: 'long', month: 'long', day: 'numeric'}
+    let newTime = time.toLocaleString('en-US', options); 
+    this.setState({displayTime: newTime})
+    setInterval(() => {
+      time = new Date(); 
+      newTime = time.toLocaleString('en-US', options); 
+      this.setState({displayTime: newTime})
+    }, 15000)
   }
 
   
@@ -30,7 +44,6 @@ class App extends Component {
         this.setState({
           latitude: lat, 
           longitude: long, 
-          date: new Date(),
         })
       }, (error)  => { // error callback that produces action in the case that the location is blocked
         if (error.code === error.PERMISSION_DENIED)
@@ -42,9 +55,9 @@ class App extends Component {
   // takes in the API call sunrise time as time parameter to transform time to UTC format so it can then be transferred to local.
   toUTCFormat(time){
     const timeArr = time.split(' ')
-    let month = this.state.date.getMonth() + 1;
-    let day = this.state.date.getDate();
-    let year = this.state.date.getFullYear();
+    let month = this.state.dateToday.getMonth() + 1;
+    let day = this.state.dateToday.getDate();
+    let year = this.state.dateToday.getFullYear();
 
     if(month.length < 2){
         month = '0' + month.toString();
@@ -71,7 +84,9 @@ class App extends Component {
   }
 
   componentDidMount(){
+    this.setState({dateToday: new Date()})
     this.getGeoLocation();
+    this.displayTime(); 
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -96,6 +111,7 @@ class App extends Component {
     return (
       <div className="App">
         {this.state.locationBlocked ? <LocationBlocked /> : null}
+        <Header  time = {this.state.displayTime}/>
       </div>
     );
   }
