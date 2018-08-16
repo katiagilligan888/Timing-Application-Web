@@ -93,7 +93,7 @@ class App extends Component {
 
   //from UTCtime to localTime
   toLocalTime(){
-    const local = moment.utc(this.state.UTCformat).local().format('hh:mm:ss a')
+    const local = moment.utc(this.state.UTCformat).local().format('hh:mm a')
      this.setState({
        localSunriseTime: local
      })
@@ -124,28 +124,52 @@ class App extends Component {
   }
 
  
-  // console.log(this.state.daysOfWeek.length)
-  render() {
 
+  render() {
+    
     //get the correct array and date to render
     let horas; 
     let firstHora; 
     let horasArr; 
+    let divStyle; 
+    
     for(let x = 0; x < this.state.daysOfWeek.length; x++){
       if(this.state.weekday === this.state.daysOfWeek[x].day){
         horas = this.state.daysOfWeek[x].horas
-        horasArr = horas.map(hora => {
+        let horaTime; 
+        for(let y = 0; y < horas.length; y ++){
+          
+        }
+      
+        horasArr = horas.map((hora, index) => {
+          let horaTime = moment(this.state.localSunriseTime, 'HH.mm').add(index,'hours').format('hh:mm a'); 
+          let horaTimePlusOne = moment(horaTime, "HH.mm").add(1,'hours').format('hh:mm a')
+          
+          if(hora === 'Saturn' || hora === 'Mars'){
+            divStyle = {
+              backgroundColor: "rgba(255,0,0,0.7)"
+            }
+          }else if(hora === 'Venus' || hora === 'Jupiter' || hora === 'Moon'){
+            divStyle = {
+              backgroundColor: "rgba(34,139,34, 0.7)"
+            }
+          }else if(hora === 'Mercury' || hora === 'Sun'){
+            divStyle = {
+              backgroundColor: "rgba(255,255,	0, 0.7)"
+            }
+          }
+         
           return (
-            <div className = 'hora'>{hora}</div>
+            <div key = {index} style = {divStyle} className = 'hora'><p className = "hour-name">Hour of: {hora} </p><p className ="time"> {horaTime} - {horaTimePlusOne}</p> </div>
           )
-        })
+        });
         firstHora = horas[0]; 
       }
   }
     return (
       <div className="App">
         {this.state.locationBlocked ? <LocationBlocked /> : null}
-        <Header day = {firstHora} time = {this.state.displayTime}/>
+        <Header sunrise = {this.state.localSunriseTime} day = {firstHora} time = {this.state.displayTime}/>
         {horasArr}
       </div>
     );
