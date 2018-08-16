@@ -4,8 +4,9 @@ import axios from 'axios';
 import moment from 'moment'; 
 import LocationBlocked from './Components/LocationBlocked'; 
 import Header from './Components/Header'; 
+import Sunrise from './sunrise.svg'; 
 
-//Sunrise and Sunset API lat and long required and date if date needed is not today's date
+
 
 class App extends Component {
   constructor(){
@@ -19,6 +20,17 @@ class App extends Component {
       UTCformat: null,
       localSunriseTime: null, 
       displayTime: null, 
+      weekday: null,
+      daysOfWeek : [
+          {day: 'Sunday', horas : ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury"]},
+          {day: 'Monday', horas : ["Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter"]},
+          {day: 'Tuesday', horas: ["Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus"]},
+          {day: 'Wednesday', horas : ["Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus","Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus","Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus","Mercury", "Moon", "Saturn"]},
+          {day: 'Thursday', horas: ["Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun"]},
+          {day: 'Friday', horas: ["Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun","Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun","Venus", "Mercury", "Moon", "Saturn","Jupiter", "Mars", "Sun","Venus", "Mercury", "Moon"]},
+          {day: 'Saturday', horas: ["Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon","Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon","Saturn","Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon","Saturn", "Jupiter", "Mars"]}
+      ], 
+      todaysHoras: null,
     }
   }
 
@@ -67,11 +79,15 @@ class App extends Component {
         day = '0' + day.toString();
     }
 
-    const yearlyDateFormat = [year, month, day].join('-');
+    let yearlyDateFormat = [year, month, day].join('-');
+    const daysArr = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    let weekday = daysArr[moment(yearlyDateFormat).day()]; 
      time = yearlyDateFormat + " " +  timeArr[0]
+     
 
      this.setState({
        UTCformat: time,
+       weekday: weekday
      })
   }
 
@@ -106,12 +122,31 @@ class App extends Component {
       this.toLocalTime()
     }
   }
-  
+
+ 
+  // console.log(this.state.daysOfWeek.length)
   render() {
+
+    //get the correct array and date to render
+    let horas; 
+    let firstHora; 
+    let horasArr; 
+    for(let x = 0; x < this.state.daysOfWeek.length; x++){
+      if(this.state.weekday === this.state.daysOfWeek[x].day){
+        horas = this.state.daysOfWeek[x].horas
+        horasArr = horas.map(hora => {
+          return (
+            <div className = 'hora'>{hora}</div>
+          )
+        })
+        firstHora = horas[0]; 
+      }
+  }
     return (
       <div className="App">
         {this.state.locationBlocked ? <LocationBlocked /> : null}
-        <Header  time = {this.state.displayTime}/>
+        <Header day = {firstHora} time = {this.state.displayTime}/>
+        {horasArr}
       </div>
     );
   }
